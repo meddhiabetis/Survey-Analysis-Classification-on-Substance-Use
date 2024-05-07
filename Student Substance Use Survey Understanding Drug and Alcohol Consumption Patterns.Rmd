@@ -1,0 +1,440 @@
+![](essai.png){alt="School Logo"}
+
+---
+title: 'Student Substance Use Survey: Understanding Drug and Alcohol Consumption Patterns'
+author: "Realised by Betis Mohamed Dhia"
+date: "Supervised by Mr. Ghazi Bel Mufti"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+Description:
+
+This project investigates drug and alcohol consumption patterns among students using survey data analysis techniques. It includes exploratory data analysis, visualization, and statistical modeling methods to comprehend the prevalence, perceptions, and behaviors associated with substance use. Techniques employed include pie charts, bar plots, correlation matrices, principal component analysis (PCA), multiple correspondence analysis (MCA), and clustering algorithms such as hierarchical clustering and k-means clustering. The findings provide insights into the prevalence of substance use, perceptions of harm, and clustering patterns within the student population, contributing to a better understanding of substance use behaviors and informing potential interventions.
+
+Survey Link :<https://forms.gle/RzB2wUjVaPfMoxjM8>
+
+<h1>Importing Data</h1>
+
+```{r}
+data<-read.csv("C:\\ESSAI\\1ere\\Analyse de donnes\\projet\\Student Substance Use Survey Understanding Drug and Alcohol Consumption Patterns.csv") 
+```
+
+```{r}
+# Remove rows with any empty values
+data <- data[rowSums(data == "" | is.na(data)) == 0, ]
+```
+
+<h1>Data Visualisation</h1>
+
+```{r}
+
+alcohol_counts <- table(data$Have.you.ever.tried.alcohol.)
+
+# Calculate percentages
+percentages <- round(100 * alcohol_counts / sum(alcohol_counts), 1)
+
+# Concatenate labels with percentages
+labels_with_percentages <- paste(c("No", "Yes"), "\n", percentages, "%", sep="")
+
+# Create a pie chart with percentages
+pie(alcohol_counts, 
+    main = "Have You Ever Tried Alcohol?",
+    labels = labels_with_percentages,
+    col = c("lightblue", "lightgreen"),
+    border = "black",
+    clockwise = TRUE,
+    radius = 1,
+    init.angle = 90,
+    cex.main = 1.5)
+```
+
+The majority of respondents (70.7%) have tried alcohol at least once, indicating that alcohol consumption is prevalent among the surveyed population.
+
+```{r}
+# Create a table of counts for the variable "How do you prefer to drink?"
+drink_counts <- table(data$How.do.you.prefer.to.drink.)
+
+# Define colors for each option
+colors <- c("lightblue", "lightgreen", "lightcoral", "lightyellow", "lightpink")
+
+# Calculate percentages
+drink_percentages <- round(100 * drink_counts / sum(drink_counts), 1)
+
+# Create labels with percentages for each category
+labels_with_percentages <- paste(names(drink_counts), "\n", drink_percentages, "%", sep="")
+
+# Create a pie chart
+pie(drink_counts, 
+    main = "Preference for Drinking",
+    labels = labels_with_percentages,
+    col = colors,
+    border = "black",
+    clockwise = TRUE,
+    radius = 1,
+    init.angle = 90,
+    cex.main = 1.5)
+ 
+```
+
+The majority of respondents (34.1%) reported that they don't drink alcohol.
+
+Among those who do drink, a significant portion prefer to drink enough to feel a lot (24.4%), followed by those who prefer enough to feel a little (19.5%) and just a glass or two (14.6%).
+
+A smaller proportion (7.3%) indicated a preference for drinking until they get drunk.
+
+```{r}
+# Create a table of counts for the variable "Do you smoke cigarettes?"
+smoking_counts <- table(data$Do.you.smoke.cigarettes.)
+
+# Define colors for each option
+colors <- c("lightblue", "lightgreen")
+
+# Calculate percentages
+smoking_percentages <- round(100 * smoking_counts / sum(smoking_counts), 1)
+
+# Concatenate labels with percentages
+labels_with_percentages <- paste(c("No", "Yes"), "\n", smoking_percentages, "%", sep="")
+
+# Create a pie chart
+pie(smoking_counts, 
+    main = "Do You Smoke Cigarettes?",
+    labels = labels_with_percentages,
+    col = colors,
+    border = "black",
+    clockwise = TRUE,
+    radius = 1,
+    init.angle = 90,
+    cex.main = 1.5)
+```
+
+The majority of respondents (58.5%) reported that they smoke cigarettes, indicating a significant prevalence of smoking behavior among the surveyed population.
+
+```{r}
+# Create a table of counts for the variable "Have you tried any of the following drugs?"
+drug_counts <- table(data$Have.you.tried.any.of.the.following.drugs..Weed..Cocaine..LSD..Heroin..Ecstasy..Inhalants..Amphetamines..Methamphetamine..)
+
+# Define colors for each option
+colors <- c("lightblue", "lightgreen")
+
+# Calculate percentages
+drug_percentages <- round(100 * drug_counts / sum(drug_counts), 1)
+
+# Concatenate labels with percentages
+labels_with_percentages <- paste(c("No", "Yes"), "\n", drug_percentages, "%", sep="")
+
+# Create a pie chart
+pie(drug_counts, 
+    main = "Have You Tried Drugs?",
+    labels = labels_with_percentages,
+    col = colors,
+    border = "black",
+    clockwise = TRUE,
+    radius = 1,
+    init.angle = 90,
+    cex.main = 1.5)
+
+```
+
+A significant proportion (39%) of respondents admitted to having tried one or more of the listed drugs.
+
+However, the majority (61%) stated that they have not experimented with any of the specified drugs.
+
+```{r}
+# Create a table of counts for the variable
+variable_counts <- table(data$How.harmful.do.you.perceive.regular.use.of.the.following.substances.to.be...Smoke.cigarettes.)
+
+# Define colors for each option
+colors <- c("lightblue", "lightgreen", "lightcoral")
+
+# Create a bar plot
+barplot(variable_counts, 
+        main = "Perceived Harm of Smoking Cigarettes",
+        xlab = "Perception of Harm",
+        ylab = "Frequency",
+        col = colors,
+        border = "black",
+        font.axis = 1, 
+        cex.names = 0.8) 
+
+```
+
+The bar plot shows perceptions of the harm associated with regular alcohol use. The majority perceive "some harm," followed by "significant harm," and a smaller group see "no harm."
+
+```{r}
+# Create a table of counts for the variable
+variable_counts <- table(data$How.harmful.do.you.perceive.regular.use.of.the.following.substances.to.be...Use.alcohol.regularly)
+
+# Create a bar plot
+barplot(variable_counts, 
+        main = "Perceived Harm of Using Alcohol Regularly",
+        xlab = "Perception of Harm",
+        ylab = "Frequency",
+        col = colors,
+        border = "black",
+        font.axis = 1,
+        cex.names = 0.8) # 
+```
+
+The bar plot illustrates how individuals perceive the harm associated with regular alcohol use. The majority of respondents perceive "some harm," followed by "significant harm," with a smaller group indicating "no harm".
+
+```{r}
+
+# Create a table of counts for the variable
+variable_counts <- table(data$How.harmful.do.you.perceive.regular.use.of.the.following.substances.to.be...Use.drugs.regulary)
+
+# Create a bar plot
+barplot(variable_counts, 
+        main = "Perceived Harm of Using Drugs Regularly",
+        xlab = "Perception of Harm",
+        ylab = "Frequency",
+        col = colors,
+        border = "black",
+        font.axis = 1, 
+        cex.names = 0.8)
+
+```
+
+The bar plot depicts respondents' perceptions of the harm associated with regular drug use. It shows that the majority of individuals perceive "significant harm," followed by "some harm," with a smaller proportion perceiving "no harm."
+
+<h1>Corrolation Matrix</h1>
+
+```{r}
+subset_data <- data[, 17:28]
+library(FactoMineR)
+library(factoextra)
+colnames(subset_data) <-
+  c(
+    "Mental_health_challenges",
+    "Overspending_on_alcohol_or_drugs",
+    "Damaged_a_friendship",
+    "Legal_issues_or_conflicts_with_authorities",
+    "Decreased_work_performance",
+    "Having_headaches",
+    "Strained_relationships_with_family_or_friends",
+    "Harm_to_others",
+    "Negative_impact_on_sleep_patterns",
+    "Self-harm_or_injuries",
+    "Negative_perceptions_from_others",
+    "Borrowed_money_to_purchase_alcohol_or_drugs"
+  )
+
+numeric_data <- subset_data
+numeric_data[] <- lapply(subset_data, function(x) {
+  factor(
+    x,
+    levels = c("Never", "Rarely", "Sometimes", "Often", "Always"),
+    ordered = TRUE
+  )
+})
+numeric_data[] <- lapply(numeric_data, as.integer)
+
+library(corrplot)
+M <- cor(numeric_data)
+library(RColorBrewer)
+col <- colorRampPalette(c("#E6F0F3", "#BDD7E7", "#8CBEDB", "#539ACF", "#0D6BA4"))(100)
+corrplot(M, type = "upper", order = "hclust", col = col, tl.col = "black", tl.cex = 0.7)
+
+```
+
+<h1>PCA</h1>
+
+The goal of PCA (Principal Component Analysis) in the alcohol and drug survey is to reduce the dimensionality of the data and uncover underlying patterns by transforming variables into a set of linearly uncorrelated components, facilitating interpretation and visualization of the data's structure.
+
+```{r}
+pca_result <- PCA(numeric_data, graph = FALSE)
+head(pca_result$eig)
+
+```
+
+Interpretation: The first two principal components explain approximately 75% of the total variance in the data, while the cumulative percentage of variance explained by these two components is around 75%
+
+```{r}
+fviz_eig(pca_result, addlabels = TRUE) +
+ ggtitle("Scree plot: Eigenvalues")
+
+```
+
+Interpretation: 1- Kaiser Criterion: We would retain principal components with eigenvalues greater than 1. In our case, only the first two components have eigenvalues exceeding 1, indicating their significance. 2- Cumulative Inertia Criterion: According to the cumulative inertia criterion, we would retain the first two principal components, explaining approximately 74.89% of the total inertia. 3- Elbow Criterion: When using the elbow method, we observe a clear bend after the second principal component, suggesting that we can suffice with only two components. =\> Thus, we opt to retain only the first two principal components, which collectively explain around 74.89% of the total inertia. This decision is supported by both the Kaiser criterion and the elbow method, indicating the significance of these two axes in capturing the variance within the data.
+
+```{r}
+var<-get_pca_var(pca_result)
+corrplot(var$cos2,is.corr=FALSE)
+```
+
+The higher the cos2, the better the variable is represented.
+
+```{r}
+fviz_pca_var(
+  pca_result,
+  col.var = "contrib",
+  gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+  repel = TRUE,
+  title = "PCA - Contribution of Variables"
+)
+```
+
+Interpretation: The PCA plot reveals distinct clusters of variables. Health-related factors, like mental health challenges and negative impact on sleep patterns, are closely grouped, suggesting a strong correlation. Similarly, variables related to behavioral and social aspects, such as overspending on alcohol, decreased work performance, and strained relationships, show tight associations. This implies that the first principal component likely represents health issues, given the close correlation among variables related to mental health and well-being.
+
+```{r}
+pca_result$var$cos2
+```
+
+```{r}
+fviz_pca_var(pca_result, col.var = "cos2")+
+ scale_color_gradient2(low="white" ,mid="blue" ,
+ high="red", midpoint = 0.6)+
+ theme_minimal()
+```
+
+In the PCA analysis, the squared cosines of variables on the first two principal components (Dim.1 and Dim.2) suggest their relationships with these axes:
+
+1.  "Mental_health_challenges" exhibits a strong association with Dim.1, while "Having_headaches" and "Negative_impact_on_sleep_patterns" also contribute significantly to this component.
+
+2.  Dim.2 is primarily influenced by "Overspending_on_alcohol_or_drugs," "Damaged_a_friendship," and "Strained_relationships_with_family_or_friends," indicating their importance in explaining the variability along this axis.
+
+These observations suggest that Dim.1 might represent factors related to mental health and well-being, while Dim.2 may capture aspects such as social interactions and interpersonal relationships, including challenges like overspending on alcohol or drugs and strained relationships.
+
+```{r}
+fviz_pca_ind(pca_result, geom = "text", col.ind = "cos2") + scale_color_gradient2(
+  low = "blue",
+  mid = "white",
+  high = "red",
+  midpoint = 0.5
+)
+
+```
+
+<h1>MCA</h1>
+
+The goal of MCA (Multiple Correspondence Analysis) in the alcohol and drug survey is to analyze the relationships between categorical variables, such as different types of substance use and demographic characteristics, in order to identify patterns and associations among these variables within the dataset.
+
+```{r}
+library(FactoMineR)
+library(factoextra)
+mca_subset <- data[, c(6, 8:10, 14:16)]
+# Current column names
+current_colnames <- colnames(mca_subset)
+
+# Shorter column names
+short_colnames <- c(
+  "Tried_Alcohol",
+  "Smoke_Cigarettes",
+  "Tried_Drugs",
+  "Accessible_Drugs",
+  "Addicted",
+  "Attended_Educational_Programs",
+  "Seeking_Help"
+)
+
+# Change column names
+colnames(mca_subset) <- short_colnames
+
+mca_result <- MCA (mca_subset, graph = FALSE)
+```
+
+```{r}
+mca_result$eig
+```
+
+```{r}
+library(ggplot2)
+library(factoextra)
+fviz_eig(mca_result, addlabels = TRUE) +
+ ggtitle("Scree plot :")
+
+```
+
+```{r}
+fviz_mca_var(mca_result,
+ col.var = "contrib", # Couleur en fonction de la contribution
+ gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), # Choix de couleurs
+ repel = TRUE, # Évite le chevauchement des labels
+ ggtheme = theme_minimal() # Style du graphique
+ )
+
+```
+
+```{r}
+dimdesc(mca_result, axes=1:2, proba=0.05)$`Dim 1`
+```
+
+```{r}
+fviz_mca_ind (mca_result,select.ind = list(cos2 = 0.4),
+ repel = TRUE,
+ ggtheme = theme_minimal ())
+```
+
+<h1>Clustering</h1>
+
+```{r}
+# Load necessary libraries
+library(FactoMineR)
+
+# Calculate distance matrix
+c <- dist(scale(numeric_data), method = "euclidean")
+
+# Perform hierarchical clustering
+h <- hclust(c, method = "ward.D2")
+
+# Plot hierarchical clustering dendrogram
+plot(h, hang = -1, cex = 0.6)
+
+
+```
+
+The hierarchical clustering dendrogram illustrates the relationship and grouping of observations based on their similarity in the scaled numeric data. Observations that are clustered closer together in the dendrogram are more similar to each other in terms of their numerical attributes, while those in separate branches are more dissimilar. The height of the dendrogram represents the distance between clusters; shorter branches indicate higher similarity.
+
+```{r}
+# Perform HCPC
+res.HCPC <- HCPC(numeric_data, consol = TRUE, graph = FALSE)
+
+# Plot hierarchical tree
+plot(res.HCPC, choice = 'tree', title = 'Hierarchical tree')
+
+```
+
+The HCPC analysis resulted in the formation of four distinct clusters, visually represented by the hierarchical tree.
+
+```{r}
+plot.HCPC(res.HCPC, choice = 'map', draw.tree=FALSE, title ='Factor map')
+
+```
+
+We can clearly see that "cluster 1" individuals are more correlated to dim1 which represent health problems while "cluster 2" are slightly correlated to dim 2 which is financial and social problems.
+
+```{r}
+plot.HCPC(res.HCPC,choice = '3D.map', ind.names=FALSE, centres.plot=FALSE, angles=60,title='Hie
+rarchical tree on the factor map')
+```
+
+```{r}
+res.HCPC$desc.var
+
+```
+
+The output provides information on the relationship between cluster variables and quantitative variables, showing their strength of association, significance, and descriptive statistics within each cluster.
+
+For instance, Cluster 1 exhibits higher levels of various issues related to alcohol, drugs, and mental health, while Cluster 4 is characterized by elevated levels of overspending on alcohol or drugs, decreased work performance, and borrowing money for alcohol or drugs, indicating potential addiction and behavioral concerns.
+
+```{r}
+res.km <- eclust(numeric_data, "kmeans", nstart = 25,k=3)
+```
+
+This allows for the segmentation of the data into three distinct groups based on their similarities in the numeric features.
+
+1.  First cluster: Financial problems
+
+2.  Second cluster: Social problems
+
+3.  Third cluster: Health problems
+
+**Conclusion:**
+
+In conclusion, this study utilized various data analysis techniques to investigate patterns of drug and alcohol consumption among students. Through exploratory data analysis, visualization, and statistical modeling, we gained valuable insights into the prevalence, perceptions, and behaviors associated with substance use within the surveyed population.
+
+The findings revealed that alcohol consumption is prevalent among the students, with a significant portion reporting experimentation with various drugs. Moreover, perceptions of harm associated with substance use varied among individuals, with distinct clusters emerging based on factors such as financial, social, and health-related problems.
+
+Overall, this study contributes to a better understanding of substance use behaviors among students and highlights the need for targeted interventions to address the diverse challenges associated with drug and alcohol consumption.\
